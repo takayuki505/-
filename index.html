@@ -1,1 +1,46 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LIFFスロット</title>
+  <script src="https://static.line-scdn.net/liff/2.19.0/sdk.js"></script>
+  <style>
+    body { text-align: center; font-family: Arial, sans-serif; }
+    #slot { font-size: 2rem; margin: 20px; }
+    button { font-size: 1.5rem; padding: 10px 20px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>🎰 スロットゲーム 🎰</h1>
+  <div id="slot">❓ ❓ ❓</div>
+  <button onclick="playSlot()">スロットを回す</button>
+  <p id="result"></p>
 
+  <script>
+    const LIFF_ID = "YOUR_LIFF_ID"; // LINE Developersで取得した LIFF ID
+    const GAS_URL = "https://script.google.com/macros/s/YOUR_GAS_DEPLOYMENT_URL/exec"; // GASのURL
+
+    async function initLiff() {
+      await liff.init({ liffId: LIFF_ID });
+      if (!liff.isLoggedIn()) liff.login();
+    }
+
+    async function playSlot() {
+      const userId = await getUserId();
+      const response = await fetch(`${GAS_URL}?userId=${userId}`);
+      const data = await response.json();
+      document.getElementById("slot").innerText = data.result;
+      document.getElementById("result").innerText = data.message;
+    }
+
+    function getUserId() {
+      return new Promise((resolve) => {
+        liff.getProfile().then(profile => resolve(profile.userId));
+      });
+    }
+
+    window.onload = initLiff;
+  </script>
+</body>
+</html>
